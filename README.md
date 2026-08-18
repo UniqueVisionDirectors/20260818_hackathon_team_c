@@ -143,6 +143,26 @@ WebGPU は動的 import のため、WebGL 利用時の初期チャンクには�
 glTF / GLB は `BabylonRenderer.loadGltf()` からロードできます。
 loader は呼び出された時だけ動的に読み込まれます。
 
+### 避難経路シミュレータ
+
+Docker Composeでフロントエンドを起動した後、認証なしで
+<http://localhost:15173/evacuation>へ直接アクセスできます。
+
+1. 「経路を計算」を押し、A*が求めた経路を黄色で表示します。
+2. 「シミュレーション開始」を押し、避難者が出口まで移動することを確認します。
+3. 「リセット」を押し、経路と避難者を初期状態へ戻します。
+4. シナリオを「火災発生時」へ切り替え、危険マスを避ける経路を確認します。
+
+グリッドは`cells[y][x]`で参照し、Babylon.jsのワールド座標では
+`(x, 高さ, y)`として描画します。壁と危険マスは通行できません。
+
+フロントエンドの品質チェックと本番ビルドはDocker内で実行できます。
+
+```sh
+docker compose build frontend
+docker compose run --rm frontend npm run quality
+```
+
 ### 検証
 
 ```sh
@@ -166,5 +186,3 @@ docker compose config
 ```sh
 PGPASSWORD=password psql -h localhost -p "${POSTGRES_PORT:-15432}" -U postgres -d dev
 ```
-
-test
