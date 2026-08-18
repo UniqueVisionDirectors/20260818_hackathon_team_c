@@ -71,8 +71,8 @@ function isValidMap(map: MapDefinition): boolean {
     return false
   }
 
-  return getCell(map, map.start) !== CELL_TYPE.Wall
-    && getCell(map, map.exit) !== CELL_TYPE.Wall
+  return getCell(map, map.start) === CELL_TYPE.Walkable
+    && getCell(map, map.exit) === CELL_TYPE.Walkable
 }
 
 function isWalkable(map: MapDefinition, point: GridPoint): boolean {

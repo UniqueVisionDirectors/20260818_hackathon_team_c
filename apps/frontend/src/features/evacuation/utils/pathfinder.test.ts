@@ -28,7 +28,7 @@ describe('findPath', () => {
       { x: 1, y: 0 },
       { x: 2, y: 0 },
     ])
-    expect(result.visitedCount).toBeGreaterThan(0)
+    expect(result.visitedCount).toBe(3)
     expect(result.elapsedMs).toBeGreaterThanOrEqual(0)
     expect(result.reason).toBeUndefined()
   })
@@ -199,6 +199,29 @@ it('行の長さがwidthと一致しない場合: INVALID_MAPを返す', () => {
 
     expectInvalidMap(map)
     })
+
+    it.each([
+        ['スタート', { x: 0, y: 0 }, { x: 1, y: 0 }],
+        ['出口', { x: 1, y: 0 }, { x: 0, y: 0 }],
+    ] as const)(
+        '%sが危険マスの場合: INVALID_MAPを返す',
+        (_label, start, exit) => {
+            const map: MapDefinition = {
+                id: 'fire',
+                name: '危険マス上の地点',
+                width: 2,
+                height: 1,
+                cells: [[
+                    CELL_TYPE.Danger,
+                    CELL_TYPE.Walkable,
+                ]],
+                start,
+                exit,
+            }
+
+            expectInvalidMap(map)
+        },
+    )
 
     it('危険マスがある場合: 危険マスを通らずに迂回する', () => {
         const map: MapDefinition = {
