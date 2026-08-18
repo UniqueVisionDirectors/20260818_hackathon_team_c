@@ -13,6 +13,7 @@ declare module 'vue-router' {
 // 遅延読み込みコンポーネント
 const LoginView = () => import('@/views/LoginView.vue');
 const DashboardView = () => import('@/views/DashboardView.vue');
+const EvacuationView = () => import('@/features/evacuation/views/EvacuationView.vue');
 
 const routes: RouteRecordRaw[] = [
   {
@@ -35,6 +36,14 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       title: 'ダッシュボード'
+    }
+  },
+  {
+    path: '/evacuation',
+    name: 'Evacuation',
+    component: EvacuationView,
+    meta: {
+      title: '3D避難経路シミュレーター'
     }
   },
   {

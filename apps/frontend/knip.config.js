@@ -13,6 +13,7 @@ export default {
   entry: [
     "src/router/index.ts",
     "src/views/**/*.vue",
+    "src/features/evacuation/preview/main.ts",
     "index.html"
   ],
 
