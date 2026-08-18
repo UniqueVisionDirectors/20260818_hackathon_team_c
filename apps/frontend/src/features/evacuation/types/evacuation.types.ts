@@ -4,7 +4,8 @@ export const CELL_TYPE = {
   Danger: 2,
 } as const
 
-export type CellType = (typeof CELL_TYPE)[keyof typeof CELL_TYPE]
+export type CellType = typeof CELL_TYPE[keyof typeof CELL_TYPE]
+
 export type ScenarioId = 'normal' | 'fire'
 
 export interface GridPoint {
@@ -37,13 +38,3 @@ export type SimulationStatus =
   | 'running'
   | 'completed'
   | 'error'
-
-export interface ScenarioOption {
-  id: ScenarioId
-  label: string
-}
-
-export const SCENARIO_OPTIONS: readonly ScenarioOption[] = [
-  { id: 'normal', label: '通常時' },
-  { id: 'fire', label: '火災発生時' },
-]
