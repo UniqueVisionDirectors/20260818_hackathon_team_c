@@ -5,6 +5,7 @@ export const CELL_TYPE = {
 } as const
 
 export type CellType = (typeof CELL_TYPE)[keyof typeof CELL_TYPE]
+
 export type ScenarioId = 'normal' | 'fire'
 
 export interface GridPoint {
