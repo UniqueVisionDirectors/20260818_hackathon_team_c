@@ -73,6 +73,11 @@ const statusMessages: Record<SimulationStatus, string> = {
   error: '経路を計算できませんでした',
 }
 const statusMessage = computed(() => statusMessages[status.value])
+const activeMap = computed(() => DEMO_MAPS[scenarioId.value])
+
+const handleCanvasReady = (): void => {
+  stageRef.value?.renderMap(activeMap.value)
+}
 
 const resetSimulation = (): void => {
   calculationRevision += 1
@@ -87,6 +92,7 @@ const resetSimulation = (): void => {
 
   errorMessage.value = ''
   status.value = 'idle'
+  stageRef.value?.renderMap(activeMap.value)
 }
 
 const handleCanvasReady = (): void => {
