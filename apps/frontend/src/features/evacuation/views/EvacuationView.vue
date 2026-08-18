@@ -1,13 +1,19 @@
 <template>
   <main class="evacuation-page">
     <header class="page-header">
-      <div><p>3D EVACUATION SIMULATOR</p><h1>安全な避難経路を見つける。</h1></div>
-      <RouterLink to="/dashboard">既存アプリへ戻る</RouterLink>
+      <div>
+        <p>3D EVACUATION SIMULATOR</p>
+        <h1>安全な避難経路を見つける。</h1>
+      </div>
+      <RouterLink to="/dashboard">ダッシュボードへ戻る</RouterLink>
     </header>
 
     <section class="layout">
-      <!-- B担当のEvacuationCanvas.vue統合時に差し替える。 -->
-      <EvacuationStagePlaceholder ref="stageRef" :result="result" />
+      <EvacuationCanvas
+        ref="stageRef"
+        @ready="handleCanvasReady"
+        @simulation-complete="handleSimulationComplete"
+      />
       <EvacuationPanel
         :scenario-id="scenarioId"
         :status="status"
@@ -26,15 +32,17 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { RouterLink } from 'vue-router'
+import EvacuationCanvas from '../components/EvacuationCanvas.vue'
 import EvacuationPanel from '../components/EvacuationPanel.vue'
-import EvacuationStagePlaceholder from '../components/EvacuationStagePlaceholder.vue'
+import { DEMO_MAPS } from '../data/demoMaps'
+import { findPath } from '../services/pathfinding.service'
 import type { PathResult, ScenarioId, SimulationStatus } from '../types/evacuation.types'
 
 const scenarioId = ref<ScenarioId>('normal')
 const status = ref<SimulationStatus>('idle')
 const result = ref<PathResult | null>(null)
 const errorMessage = ref('')
-const stageRef = ref<InstanceType<typeof EvacuationStagePlaceholder> | null>(null)
+const stageRef = ref<InstanceType<typeof EvacuationCanvas> | null>(null)
 
 const statusMessages: Record<SimulationStatus, string> = {
   idle: '経路を計算できます',
@@ -45,12 +53,18 @@ const statusMessages: Record<SimulationStatus, string> = {
   error: '経路を計算できませんでした',
 }
 const statusMessage = computed(() => statusMessages[status.value])
+const activeMap = computed(() => DEMO_MAPS[scenarioId.value])
+
+const handleCanvasReady = (): void => {
+  stageRef.value?.renderMap(activeMap.value)
+}
 
 const resetSimulation = (): void => {
   stageRef.value?.reset()
   result.value = null
   errorMessage.value = ''
   status.value = 'idle'
+  stageRef.value?.renderMap(activeMap.value)
 }
 
 const handleScenarioChange = (nextScenarioId: ScenarioId): void => {
@@ -59,15 +73,32 @@ const handleScenarioChange = (nextScenarioId: ScenarioId): void => {
 }
 
 const handleCalculate = (): void => {
-  // A担当のfindPath(map)を統合する箇所。契約だけ先に固定している。
-  status.value = 'idle'
-  errorMessage.value = '経路探索モジュールの統合待ちです。'
+  status.value = 'calculating'
+  errorMessage.value = ''
+  const pathResult = findPath(activeMap.value)
+  result.value = pathResult
+
+  if (!pathResult.found) {
+    status.value = 'error'
+    errorMessage.value = pathResult.reason === 'NO_ROUTE'
+      ? '安全な経路が見つかりません。'
+      : 'マップデータが不正です。'
+    return
+  }
+
+  stageRef.value?.renderMap(activeMap.value)
+  stageRef.value?.renderPath(pathResult.path)
+  status.value = 'ready'
 }
 
 const handleStart = (): void => {
-  if (!result.value?.found || !stageRef.value) return
+  if (!result.value?.found) return
   status.value = 'running'
-  stageRef.value.startAnimation(() => { status.value = 'completed' })
+  stageRef.value?.startSimulation(result.value.path)
+}
+
+const handleSimulationComplete = (): void => {
+  status.value = 'completed'
 }
 
 const handleReset = (): void => resetSimulation()

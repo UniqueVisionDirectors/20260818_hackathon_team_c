@@ -72,6 +72,21 @@
         </div>
 
         <div class="workspace__grid">
+          <article class="panel panel--evacuation">
+            <div class="panel__heading">
+              <div>
+                <span class="panel__number">00</span>
+                <h3>3D避難経路シミュレーター</h3>
+              </div>
+            </div>
+            <p class="empty-state">
+              A*で安全な経路を計算し、Babylon.jsの3D空間で避難の動きを確認できます。
+            </p>
+            <RouterLink class="button button--primary" to="/evacuation">
+              シミュレーターを開く
+            </RouterLink>
+          </article>
+
           <article class="panel">
             <div class="panel__heading">
               <div>
